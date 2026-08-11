@@ -4,16 +4,14 @@ import (
 	"log"
 	"net/http"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	"github.com/AchrafIbrahim/WORK_APPLY_BOT/config"
 	"github.com/AchrafIbrahim/WORK_APPLY_BOT/database"
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		log.Println("Warning: .env file not found")
-	}
+	cfg := config.Load()
 
-	db, err := database.Connect()
+	db, err := database.Connect(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
