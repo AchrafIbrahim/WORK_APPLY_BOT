@@ -1,11 +1,14 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"github.com/gin-gonic/gin"
 	"github.com/AchrafIbrahim/WORK_APPLY_BOT/config"
 	"github.com/AchrafIbrahim/WORK_APPLY_BOT/database"
+	"github.com/AchrafIbrahim/WORK_APPLY_BOT/handlers"
+	"github.com/AchrafIbrahim/WORK_APPLY_BOT/repositories"
+	"github.com/AchrafIbrahim/WORK_APPLY_BOT/services"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
 )
 
 func main() {
@@ -19,11 +22,19 @@ func main() {
 
 	log.Println("Database connection successful")
 
+	applicationRepository := repositories.NewApplicationRepository(db)
+	applicationService := services.NewApplicationService(
+		applicationRepository,
+	)
+	applicationHandler := handlers.NewApplicationHandler(
+		applicationService,
+	)
+
 	r := gin.Default()
 
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"status": "ok",
+			"status":  "ok",
 			"message": "WORK APPLY BOT is running",
 		})
 	})
@@ -42,6 +53,7 @@ func main() {
 			"message": "Database connection is healthy",
 		})
 	})
+	r.POST("/applications", applicationHandler.CreateApplication)
 
 	r.Run(":8081")
 }
